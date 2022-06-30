@@ -1,0 +1,1 @@
+{"Created":"2022-06-29T14:57:03.817161763Z","name":"_meta_","retention":"limits","max_consumers":0,"max_msgs":0,"max_bytes":0,"max_age":0,"max_msgs_per_subject":0,"discard":"old","storage":"file","num_replicas":0,"sealed":false,"deny_delete":false,"deny_purge":false,"allow_rollup_hdrs":false}
