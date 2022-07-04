@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	qualiapb "github.com/tachunwu/qualia/pkg/proto/qualia"
+	"go.uber.org/zap"
 )
 
 var TxnQueueSizeLimit int = 4096
@@ -12,16 +13,20 @@ var TxnQueueSizeLimit int = 4096
 type Sched struct {
 	mu              sync.Mutex
 	data            map[*qualiapb.KeyEntry]Value
-	txnQueue        TxnQueue
+	txnQueue        *TxnQueue
 	newTxnRequestCh chan *qualiapb.Txn
 	executeTxnCh    chan *qualiapb.Txn
+	log             *zap.Logger
 }
 
 func NewSched() *Sched {
+	log, _ := zap.NewProduction()
 	return &Sched{
+		txnQueue:        NewTxnQueue(),
 		data:            make(map[*qualiapb.KeyEntry]Value),
-		newTxnRequestCh: make(chan *qualiapb.Txn),
-		executeTxnCh:    make(chan *qualiapb.Txn),
+		newTxnRequestCh: make(chan *qualiapb.Txn, 1),
+		executeTxnCh:    make(chan *qualiapb.Txn, 1),
+		log:             log,
 	}
 }
 
@@ -49,13 +54,24 @@ func NewTxnQueue() *TxnQueue {
 func (tq *TxnQueue) Enqueue(t *qualiapb.Txn) {
 	tq.queue.PushBack(t)
 }
-func (tq *TxnQueue) Remove(t *qualiapb.Txn) {
-	e := &list.Element{
-		Value: t,
-	}
-	tq.queue.Remove(e)
+
+func (tq *TxnQueue) RemoveFront() {
+	tq.queue.Remove(tq.queue.Front())
 }
-func (tq *TxnQueue) Front() *qualiapb.Txn { return tq.queue.Front().Value.(*qualiapb.Txn) }
+
+func (tq *TxnQueue) RemoveBack() {
+	tq.queue.Remove(tq.queue.Back())
+}
+func (tq *TxnQueue) Front() *qualiapb.Txn {
+	if tq.queue.Front() != nil {
+		return tq.queue.Front().Value.(*qualiapb.Txn)
+	}
+	return nil
+}
 func (tq *TxnQueue) IsNotFull() bool {
 	return tq.queue.Len() < TxnQueueSizeLimit
+}
+
+func (tq *TxnQueue) Len() int {
+	return tq.queue.Len()
 }

@@ -34,7 +34,7 @@ func (sched *Sched) BeginTxn(t *qualiapb.Txn) {
 	sched.mu.Unlock()
 }
 
-func (sched *Sched) FinishTxn(t *qualiapb.Txn) {
+func (sched *Sched) FinishTxn(t *qualiapb.Txn, fromFront bool) {
 	/* <begin critical section> */
 	sched.mu.Lock()
 
@@ -49,28 +49,41 @@ func (sched *Sched) FinishTxn(t *qualiapb.Txn) {
 		data.cx--
 		sched.data[key] = data
 	}
+	if fromFront {
+		sched.txnQueue.RemoveFront()
+	} else {
+		sched.txnQueue.RemoveBack()
+	}
 
-	sched.txnQueue.Remove(t)
 	/* <end critical section> */
 	sched.mu.Unlock()
 }
 
 func (sched *Sched) VLL() {
 	for {
-		if sched.txnQueue.Front().TxnType == qualiapb.Txn_BLOCKED {
+		if sched.txnQueue.Len() != 0 && sched.txnQueue.Front().TxnType == qualiapb.Txn_BLOCKED {
+
 			t := sched.txnQueue.Front()
 			t.TxnType = qualiapb.Txn_FREE
 			// TODO: Execute txn
-			sched.FinishTxn(t)
+
+			sched.FinishTxn(t, true)
+
 		} else if sched.txnQueue.IsNotFull() {
+
 			// TODO: GetNewTxnRequest()
 			t := <-sched.newTxnRequestCh
+			if t != nil {
 
-			sched.BeginTxn(t)
-			if t.TxnType == qualiapb.Txn_FREE {
-				// TODO: Execute txn
-				sched.FinishTxn(t)
+				sched.BeginTxn(t)
+				if t.TxnType == qualiapb.Txn_FREE {
+					// TODO: Execute txn
+					// log.Println("txn execute", t.TxnId)
+
+					sched.FinishTxn(t, false)
+				}
 			}
+
 		}
 	}
 }
