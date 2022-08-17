@@ -32,3 +32,16 @@ message KeyEntry {
     uint32 master = 2;
     uint64 counter = 3;
 }
+
+message KeyValue {
+    KeyEntry key_entry = 1;
+    bytes value = 2;
+}
+
+message TxnResponse {
+    repeated KeyValue rows = 1;
+}
+
+service QualiaService {
+    rpc ReceiveNewTxn(Txn) returns (TxnResponse){}
+}

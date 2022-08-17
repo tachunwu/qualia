@@ -1,0 +1,4 @@
+cache0: go run cache.go  --addr=localhost:4000
+cache1: go run cache.go  --addr=localhost:4001
+cache2: go run cache.go  --addr=localhost:4002
+cache3: go run cache.go  --addr=localhost:4003

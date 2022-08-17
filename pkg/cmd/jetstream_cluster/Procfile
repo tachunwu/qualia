@@ -1,5 +1,4 @@
-jetstream0: ./nats-server -D -js -config cluster/n0.conf
-jetstream1: ./nats-server -D -js -config cluster/n1.conf
-jetstream2: ./nats-server -D -js -config cluster/n2.conf
-jetstream3: ./nats-server -D -js -config cluster/n3.conf
-jetstream4: ./nats-server -D -js -config cluster/n4.conf
+jetstream0: ./nats-server -V -js -config cluster/n0.conf
+jetstream1: ./nats-server -V -js -config cluster/n1.conf
+jetstream2: ./nats-server -V -js -config cluster/n2.conf
+jetstream3: ./nats-server -V -js -config cluster/n3.conf
