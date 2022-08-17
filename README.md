@@ -5,6 +5,7 @@
 
 ## Architecture
 ![Alt text](./doc/images/architecture.svg)
+
 以上是 Qualia 的系統設計圖，主要設計三個主要的 API，分別是 Cache、Snapshot、Transmitter，在後面的細項會仔細介紹他們的功用。傳統的 3-Tier 架構包含前端、後端以及資料庫，而 Qualia 就是部署在後端和資料庫之間。綠色的框框表示一個部署單位，也就是 Kubernetes 上面的 Pod，最下方的黃色框框則表示就有的資料庫系統。
 
 ### Component: Transport
