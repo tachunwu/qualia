@@ -22,7 +22,7 @@ Qualia 本身的概念就是用 Stream 組成的中間件，我們可以在平�
 
 至於如何把 Event 據合成狀態，則是採取 VLL 這篇論文的實作方式，依照順序一次性的將所有 key 鎖住然後執行，如果中途遇到 Process Failure，只要等待機器重新啟動接續 Stream 游標的位置繼續直行即可。
 
-## How to start
+## How to start Qualia
 
 ### Start NATS Cluster
 
@@ -32,3 +32,18 @@ Qualia 本身的概念就是用 Stream 組成的中間件，我們可以在平�
 
 ### Start Snapshot Service
 
+## NATS General Notes
+主要記錄一下 NATS 所支援的語意特性，在開發時可以正確使用。
+### QoS
+Core NATS 只有提供 At most once，也就是說如果 Consumer 離線的話訊息會直接被燒掉。如果需要 At least once 或 Exactly once 需要啟動 JetStream。
+
+### JetStream Consumer
+JetStream Consumer 比較多細節。
+#### Pull Consumer
+
+#### Push Consumer
+* MaxAckPending: one-to-many 可以設定要多少 Ack 才能夠繼續送訊息，不然就會停止。
+* Flow Control
+
+### Sync/Async Subscription
+Sync 必須等應用程式回應才能收下一個訊息。Async 則是先設定好 Callback Function，NATS 會 Concurrent 把訊息送出去。注意，其實訊息是 Serially 的被發送，但是並不會等到應用程式端執行完成後才發送下一則。

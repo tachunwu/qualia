@@ -1,11 +1,12 @@
 syntax = "proto3";
 package qualia;
-// import "qualia/txn.proto";
+import "qualia/txn.proto";
 
 service CacheService {
     rpc Get(GetRequest) returns (GetResponse){}
     rpc Set(SetRequest) returns (SetResponse){}
     rpc Del(DelRequest) returns (DelResponse){}
+    rpc Scan(ScanRequest) returns (ScanResponse){}
 }
 
 message GetRequest {
@@ -14,12 +15,11 @@ message GetRequest {
 
 message GetResponse {
     string status = 1;
-    bytes value = 2;
+    qualia.KeyValue value = 2;
 }
 
 message SetRequest {
-    bytes key = 1;
-    bytes value = 2;
+    qualia.KeyValue key_value = 1;
 }
 
 message SetResponse {
@@ -32,6 +32,16 @@ message DelRequest {
 
 message DelResponse {
     string status = 1;
+}
+
+message ScanRequest {
+    bytes start_key = 1;
+    bytes end_key = 2;
+    uint32 limit = 3;
+}
+
+message ScanResponse {
+    repeated qualia.KeyValue rows = 1;
 }
 
 

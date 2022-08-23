@@ -27,6 +27,7 @@ message Txn {
     Type txn_type = 40; 
 }
 
+// Key-Value
 message KeyEntry {
     bytes  key = 1;
     uint32 master = 2;
@@ -34,7 +35,7 @@ message KeyEntry {
 }
 
 message KeyValue {
-    KeyEntry key_entry = 1;
+    bytes key = 1;
     bytes value = 2;
 }
 

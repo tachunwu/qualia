@@ -98,8 +98,8 @@ func (g *grpc) Serve() {
 
 func (g *grpc) Get(ctx context.Context, req *qualiapb.GetRequest) (*qualiapb.GetResponse, error) {
 	// Hash the key
-	partition := xxhash.Sum64(req.Key) % uint64(len(g.peers))
-	log.Println("Start Get command key: ", string(req.Key), "hash to :", partition)
+	partition := xxhash.Sum64(req.GetKey().Key) % uint64(len(g.peers))
+	log.Println("Start Get command key: ", string(req.Key.Key), "hash to :", partition)
 
 	// Pulish
 	data, err := proto.Marshal(req)
@@ -115,14 +115,14 @@ func (g *grpc) Get(ctx context.Context, req *qualiapb.GetRequest) (*qualiapb.Get
 	}
 
 	return &qualiapb.GetResponse{
-		Value: msg.Data,
+		Status: "success",
 	}, nil
 }
 
 func (g *grpc) Set(ctx context.Context, req *qualiapb.SetRequest) (*qualiapb.SetResponse, error) {
 	// Hash the key
-	partition := xxhash.Sum64(req.Key) % uint64(len(g.peers))
-	log.Println("Start Set command key: ", string(req.Key), "hash to :", partition)
+	partition := xxhash.Sum64(req.GetKeyValue().KeyEntry.Key) % uint64(len(g.peers))
+	log.Println("Start Set command key: ", string(req.GetKeyValue().KeyEntry.Key), "hash to :", partition)
 
 	// Pulish
 	data, err := proto.Marshal(req)
@@ -143,7 +143,7 @@ func (g *grpc) Set(ctx context.Context, req *qualiapb.SetRequest) (*qualiapb.Set
 
 func (g *grpc) Del(ctx context.Context, req *qualiapb.DelRequest) (*qualiapb.DelResponse, error) {
 	// Hash the key
-	partition := xxhash.Sum64(req.Key) % uint64(len(g.peers))
+	partition := xxhash.Sum64(req.GetKey().Key) % uint64(len(g.peers))
 	log.Println("Start Del command key: ", string(req.Key), "hash to :", partition)
 
 	// Pulish
